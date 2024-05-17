@@ -1,10 +1,10 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 
-const char* ssid = "****";
-const char* password = "*******";
-const char* serverAddress = "1.1.1.1";
-const int serverPort = 3000;
+const char* ssid = "****"; //nombre de wi-fi
+const char* password = "*******"; //contraseña wi-fi
+const char* serverAddress = "1.1.1.1"; //direccion ip de la red del rasbperry
+const int serverPort = 3000; // puerto tcp
 
 WiFiClient client;
 const int sensorPin = 34;
