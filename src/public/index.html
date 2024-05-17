@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <title>Interfaz de Envío TCP</title>
+
+     <body>
+  </head>
+  <body class="flex flex-col items-center justify-center bg-gray-100">
+    <h1 id="" class="text-4xl text-red-600 mt-10">INTERFAZ VIA TCP</h1>
+
+    <!-- Contenedor del gráfico -->
+    <div class="md:flex gap-4 justify-center">
+      <div class="my-8 bg-white">
+        <canvas id="myChart" width="400" height="400"></canvas>
+      </div>
+      <div class="my-8 bg-white">
+        <canvas id="myChart2" width="400" height="400"></canvas>
+      </div>
+    </div>
+
+
+    <script>
+
+      //cahrt-----------------------
+      document.addEventListener('DOMContentLoaded', () => {
+      const socket = io('http://1.1.1.1:4000');
+
+      const dataForm = document.getElementById("dataForm");
+      const ctx = document.getElementById("myChart").getContext("2d");
+      const ctx2 = document.getElementById("myChart2").getContext("2d");
+      let myChart = null;
+      let myChart2 = null;
+
+      socket.on('connect', () => {
+        console.log('Conexión Socket.io establecida');
+      });
+
+      socket.on('newData', (data) => {
+        console.log(data)
+        const diaValue = data[0];
+        const split = data[1].split(",");
+        const num1 = parseFloat(split[0]);
+        const num2 = parseFloat(split[1]);
+
+        if (myChart === null) {
+          myChart = new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: [],
+              datasets: [
+                {
+                  label: "Datos de Gas",
+                  data: [],
+                  backgroundColor: "rgb(30, 43, 215. 1)",
+                  borderColor: "rgba(146, 105, 241, 1)",
+                  borderWidth: 2,
+                },
+              ],
+            },
+            options: {
+              scales: {
+                yAxes: [
+                  {
+                    ticks: {
+                      beginAtZero: true,
+                    },
+                  },
+                ],
+              },
+            },
+          });
+        }
+
+        if (myChart2 === null) {
+          myChart2 = new Chart(ctx2, {
+            type: "bar",
+            data: {
+              labels: [],
+              datasets: [
+                {
+                  label: "Datos de Vibración",
+                  data: [],
+                  backgroundColor: "rgba(255, 99, 132, 0.5)",
+                  borderColor: "rgba(255, 99, 132, 1)",
+                  borderWidth: 2,
+                },
+              ],
+            },
+            options: {
+              scales: {
+                yAxes: [
+                  {
+                    ticks: {
+                      beginAtZero: true,
+                    },
+                  },
+                ],
+              },
+            },
+          });
+        }
+        if (myChart.data.labels.length === 7) {
+          myChart.data.labels.shift();
+          myChart.data.datasets[0].data.shift();
+
+          myChart2.data.labels.shift();
+          myChart2.data.datasets[0].data.shift();
+        }
+        myChart.data.labels.push(diaValue);
+        myChart.data.datasets[0].data.push(num1);
+        myChart.update();
+
+        myChart2.data.labels.push(diaValue);
+        myChart2.data.datasets[0].data.push(num2);
+        myChart2.update();;
+      });
+
+      socket.on('disconnect', () => {
+        console.log('Conexión Socket.io cerrada');
+      });
+    });
+    </script>
+  </body>
+</html>
